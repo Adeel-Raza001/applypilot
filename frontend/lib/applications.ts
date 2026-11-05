@@ -28,3 +28,7 @@ export function deleteApplication(id: number) {
     method: 'DELETE',
   });
 }
+
+export function getApplication(id: number) {
+  return apiFetch<Application>(`/applications/${id}`);
+}

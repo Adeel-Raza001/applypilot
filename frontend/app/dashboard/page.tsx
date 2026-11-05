@@ -6,6 +6,7 @@ import AddApplicationForm from '@/components/AddApplicationForm';
 import KanbanBoard from '@/components/KanbanBoard';
 import { useAuth } from '@/context/AuthContext';
 import { ApiError } from '@/lib/api';
+import Link from 'next/link';
 import {
   deleteApplication,
   listApplications,
@@ -95,6 +96,12 @@ export default function DashboardPage() {
           <p className="text-sm text-gray-600">Welcome, {user.name}</p>
         </div>
         <div className="flex gap-2">
+          <Link
+            href="/resume"
+            className="rounded border border-gray-300 px-3 py-2 text-sm text-gray-700 hover:bg-gray-100"
+          >
+            My resume
+          </Link>
           <button
             onClick={() => setShowForm((v) => !v)}
             className="rounded bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
