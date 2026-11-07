@@ -10,3 +10,12 @@ export function saveResume(content: string) {
     body: JSON.stringify({ content }),
   });
 }
+
+export function extractResumeText(file: File) {
+  const form = new FormData();
+  form.append('file', file);
+  return apiFetch<{ content: string; truncated: boolean }>('/resume/extract', {
+    method: 'POST',
+    body: form,
+  });
+}

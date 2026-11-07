@@ -1,18 +1,23 @@
 'use client';
 
+import { Plus, Rocket, Search } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { toast } from 'sonner';
 import AddApplicationForm from '@/components/AddApplicationForm';
 import KanbanBoard from '@/components/KanbanBoard';
+import { DashboardSkeleton, PageLoader } from '@/components/Skeleton';
+import StatsCards from '@/components/StatsCards';
 import { useAuth } from '@/context/AuthContext';
 import { ApiError } from '@/lib/api';
-import Link from 'next/link';
 import {
   deleteApplication,
   listApplications,
   updateApplicationStatus,
 } from '@/lib/applications';
-import { Application, ApplicationStatus } from '@/lib/types';
+import { Application, ApplicationStatus, STATUSES } from '@/lib/types';
+
+type Filter = 'ALL' | ApplicationStatus;
 
 export default function DashboardPage() {
   const { user, loading, logout } = useAuth();
@@ -20,17 +25,18 @@ export default function DashboardPage() {
   const [applications, setApplications] = useState<Application[]>([]);
   const [fetching, setFetching] = useState(true);
   const [showForm, setShowForm] = useState(false);
-  const [error, setError] = useState('');
+  const [query, setQuery] = useState('');
+  const [filter, setFilter] = useState<Filter>('ALL');
 
   const handleError = useCallback(
     (err: unknown) => {
-      // Token expire ho gaya to login par bhejo
       if (err instanceof ApiError && err.status === 401) {
         logout();
         router.replace('/login');
+        toast.error('Session expired. Please login again.');
         return;
       }
-      setError(err instanceof Error ? err.message : 'Something went wrong');
+      toast.error(err instanceof Error ? err.message : 'Something went wrong');
     },
     [logout, router],
   );
@@ -53,101 +59,144 @@ export default function DashboardPage() {
     if (user) load();
   }, [user, load]);
 
+  const visible = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    return applications.filter(
+      (a) =>
+        (filter === 'ALL' || a.status === filter) &&
+        (!q ||
+          a.company.toLowerCase().includes(q) ||
+          a.jobTitle.toLowerCase().includes(q)),
+    );
+  }, [applications, query, filter]);
+
   async function handleStatusChange(id: number, status: ApplicationStatus) {
-    setError('');
     const previous = applications;
-    // Optimistic update: UI foran badlo
     setApplications((list) =>
       list.map((a) => (a.id === id ? { ...a, status } : a)),
     );
     try {
       await updateApplicationStatus(id, status);
-    } catch (err) {
-      setApplications(previous); // fail hua to purani state wapas
-      handleError(err);
-    }
-  }
-
-  async function handleDelete(id: number) {
-    setError('');
-    const previous = applications;
-    setApplications((list) => list.filter((a) => a.id !== id));
-    try {
-      await deleteApplication(id);
+      const label = STATUSES.find((s) => s.value === status)?.label ?? status;
+      toast.success(`Moved to ${label}`);
     } catch (err) {
       setApplications(previous);
       handleError(err);
     }
   }
 
-  if (loading || !user) {
-    return (
-      <main className="flex min-h-screen items-center justify-center">
-        <p className="text-gray-600">Loading...</p>
-      </main>
-    );
+  async function handleDelete(id: number) {
+    const previous = applications;
+    setApplications((list) => list.filter((a) => a.id !== id));
+    try {
+      await deleteApplication(id);
+      toast.success('Application deleted');
+    } catch (err) {
+      setApplications(previous);
+      handleError(err);
+    }
   }
 
+  if (loading || !user) return <PageLoader />;
+
+  const firstName = user.name.split(' ')[0];
+
   return (
-    <main className="mx-auto max-w-7xl p-4 sm:p-6">
-      <header className="mb-6 flex flex-wrap items-center justify-between gap-3">
+    <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6">
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">ApplyPilot</h1>
-          <p className="text-sm text-gray-600">Welcome, {user.name}</p>
-        </div>
-        <div className="flex gap-2">
-          <Link
-            href="/resume"
-            className="rounded border border-gray-300 px-3 py-2 text-sm text-gray-700 hover:bg-gray-100"
-          >
-            My resume
-          </Link>
-          <button
-            onClick={() => setShowForm((v) => !v)}
-            className="rounded bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
-          >
-            {showForm ? 'Close' : 'Add application'}
-          </button>
-          <button
-            onClick={() => {
-              logout();
-              router.push('/login');
-            }}
-            className="rounded border border-gray-300 px-3 py-2 text-sm text-gray-700 hover:bg-gray-100"
-          >
-            Logout
-          </button>
-        </div>
-      </header>
-
-      {error && (
-        <p className="mb-4 rounded bg-red-50 p-3 text-sm text-red-700">
-          {error}
-        </p>
-      )}
-
-      {showForm && (
-        <AddApplicationForm
-          onCreated={(created) => setApplications((list) => [created, ...list])}
-          onClose={() => setShowForm(false)}
-        />
-      )}
-
-      {fetching ? (
-        <p className="text-gray-600">Loading applications...</p>
-      ) : applications.length === 0 && !showForm ? (
-        <div className="rounded-xl border border-dashed border-gray-300 p-10 text-center">
-          <p className="text-gray-700">No applications yet.</p>
-          <p className="mt-1 text-sm text-gray-500">
-            Click &quot;Add application&quot; to track your first job.
+          <h1 className="text-2xl font-bold text-fg">Hi, {firstName}</h1>
+          <p className="text-sm text-muted">
+            Track every application in one place.
           </p>
         </div>
+        <button
+          type="button"
+          onClick={() => setShowForm((v) => !v)}
+          className="btn-primary"
+        >
+          <Plus size={16} />
+          {showForm ? 'Close' : 'Add application'}
+        </button>
+      </div>
+
+      {fetching ? (
+        <DashboardSkeleton />
       ) : (
-        <KanbanBoard
-          applications={applications}
-          onStatusChange={handleStatusChange}
-          onDelete={handleDelete}
-        />
+        <>
+          <StatsCards applications={applications} />
+
+          <div className="mt-6 flex flex-wrap items-center gap-3">
+            <div className="relative w-full max-w-xs">
+              <Search
+                size={16}
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-muted"
+              />
+              <input
+                className="field pl-9"
+                placeholder="Search company or role"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+              />
+            </div>
+
+            <div className="flex flex-wrap gap-2">
+              {[{ value: 'ALL' as Filter, label: 'All' }, ...STATUSES].map(
+                (s) => (
+                  <button
+                    key={s.value}
+                    type="button"
+                    onClick={() => setFilter(s.value as Filter)}
+                    className={`rounded-full border px-3 py-1 text-xs font-medium transition ${
+                      filter === s.value
+                        ? 'border-brand bg-brand text-brand-fg'
+                        : 'border-line text-muted hover:text-fg'
+                    }`}
+                  >
+                    {s.label}
+                  </button>
+                ),
+              )}
+            </div>
+          </div>
+
+          <div className="mt-6">
+            {showForm && (
+              <AddApplicationForm
+                onCreated={(created) =>
+                  setApplications((list) => [created, ...list])
+                }
+                onClose={() => setShowForm(false)}
+              />
+            )}
+
+            {applications.length === 0 && !showForm ? (
+              <div className="card flex flex-col items-center gap-3 border-dashed p-12 text-center">
+                <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-brand/10 text-brand">
+                  <Rocket size={24} />
+                </span>
+                <p className="font-medium text-fg">No applications yet</p>
+                <p className="text-sm text-muted">
+                  Add your first job to start tracking and get an AI match score.
+                </p>
+                <button
+                  type="button"
+                  onClick={() => setShowForm(true)}
+                  className="btn-primary"
+                >
+                  <Plus size={16} />
+                  Add application
+                </button>
+              </div>
+            ) : (
+              <KanbanBoard
+                applications={visible}
+                onStatusChange={handleStatusChange}
+                onDelete={handleDelete}
+              />
+            )}
+          </div>
+        </>
       )}
     </main>
   );

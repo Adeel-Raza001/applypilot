@@ -11,9 +11,10 @@ import { getResume } from '@/lib/resume';
 import { Application, ApplicationStatus, STATUSES } from '@/lib/types';
 
 function scoreClasses(score: number) {
-  if (score >= 70) return 'bg-green-100 text-green-800';
-  if (score >= 40) return 'bg-yellow-100 text-yellow-800';
-  return 'bg-red-100 text-red-800';
+  if (score >= 70)
+    return 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-400';
+  if (score >= 40) return 'bg-amber-500/10 text-amber-700 dark:text-amber-400';
+  return 'bg-rose-500/10 text-rose-700 dark:text-rose-400';
 }
 
 export default function ApplicationDetailPage() {
@@ -126,7 +127,7 @@ export default function ApplicationDetailPage() {
   if (loading || !user) {
     return (
       <main className="flex min-h-screen items-center justify-center">
-        <p className="text-gray-600">Loading...</p>
+        <p className="text-muted">Loading...</p>
       </main>
     );
   }
@@ -135,12 +136,12 @@ export default function ApplicationDetailPage() {
 
   return (
     <main className="mx-auto max-w-3xl p-4 sm:p-6">
-      <Link href="/dashboard" className="text-sm text-blue-600 underline">
+      <Link href="/dashboard" className="text-sm text-brand underline">
         &larr; Back to dashboard
       </Link>
 
       {fetching ? (
-        <p className="mt-4 text-gray-600">Loading application...</p>
+        <p className="mt-4 text-muted">Loading application...</p>
       ) : !application ? (
         <p className="mt-4 rounded bg-red-50 p-3 text-sm text-red-700">
           {error || 'Application not found.'}
@@ -149,17 +150,17 @@ export default function ApplicationDetailPage() {
         <>
           <header className="mt-3 flex flex-wrap items-start justify-between gap-3">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">
+              <h1 className="text-2xl font-bold text-fg">
                 {application.company}
               </h1>
-              <p className="text-gray-600">{application.jobTitle}</p>
+              <p className="text-muted">{application.jobTitle}</p>
             </div>
             <select
               value={application.status}
               onChange={(e) =>
                 handleStatusChange(e.target.value as ApplicationStatus)
               }
-              className="rounded border border-gray-300 bg-white p-2 text-sm text-gray-900"
+              className="rounded border border-line bg-surface p-2 text-sm text-fg"
             >
               {STATUSES.map((s) => (
                 <option key={s.value} value={s.value}>
@@ -184,20 +185,20 @@ export default function ApplicationDetailPage() {
             </p>
           )}
 
-          <section className="mt-6 rounded-xl border border-gray-200 bg-white p-4">
-            <h2 className="font-semibold text-gray-900">Job description</h2>
-            <p className="mt-2 max-h-60 overflow-y-auto whitespace-pre-wrap text-sm text-gray-700">
+          <section className="mt-6 rounded-xl border border-line bg-surface p-4">
+            <h2 className="font-semibold text-fg">Job description</h2>
+            <p className="mt-2 max-h-60 overflow-y-auto whitespace-pre-wrap text-sm text-fg">
               {application.jobDescription}
             </p>
           </section>
 
-          <section className="mt-6 rounded-xl border border-gray-200 bg-white p-4">
+          <section className="mt-6 rounded-xl border border-line bg-surface p-4">
             <div className="flex items-center justify-between gap-3">
-              <h2 className="font-semibold text-gray-900">Resume match</h2>
+              <h2 className="font-semibold text-fg">Resume match</h2>
               <button
                 onClick={handleAnalyze}
                 disabled={busy || resumeEmpty}
-                className="rounded bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-60"
+                className="rounded bg-brand px-4 py-2 text-sm font-medium text-brand-fg hover:opacity-90 disabled:opacity-60"
               >
                 {analyzing
                   ? 'Analyzing...'
@@ -208,7 +209,7 @@ export default function ApplicationDetailPage() {
             </div>
 
             {analyzing && (
-              <p className="mt-3 text-sm text-gray-500">
+              <p className="mt-3 text-sm text-muted">
                 This can take up to a minute when the AI is busy.
               </p>
             )}
@@ -222,19 +223,19 @@ export default function ApplicationDetailPage() {
                 </span>
 
                 {summary && (
-                  <p className="mt-3 text-sm text-gray-700">{summary}</p>
+                  <p className="mt-3 text-sm text-fg">{summary}</p>
                 )}
 
                 {application.missingSkills.length > 0 && (
                   <div className="mt-3">
-                    <p className="text-sm font-medium text-gray-900">
+                    <p className="text-sm font-medium text-fg">
                       Missing skills
                     </p>
                     <div className="mt-2 flex flex-wrap gap-2">
                       {application.missingSkills.map((skill) => (
                         <span
                           key={skill}
-                          className="rounded-full bg-gray-100 px-3 py-1 text-xs text-gray-700"
+                          className="rounded-full bg-line/40 px-3 py-1 text-xs text-fg"
                         >
                           {skill}
                         </span>
@@ -246,14 +247,14 @@ export default function ApplicationDetailPage() {
             )}
           </section>
 
-          <section className="mt-6 rounded-xl border border-gray-200 bg-white p-4">
+          <section className="mt-6 rounded-xl border border-line bg-surface p-4">
             <div className="flex items-center justify-between gap-3">
-              <h2 className="font-semibold text-gray-900">Cover letter</h2>
+              <h2 className="font-semibold text-fg">Cover letter</h2>
               <div className="flex gap-2">
                 {application.coverLetter && (
                   <button
                     onClick={handleCopy}
-                    className="rounded border border-gray-300 px-3 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    className="rounded border border-line px-3 py-2 text-sm text-fg hover:bg-line/40"
                   >
                     {copied ? 'Copied!' : 'Copy'}
                   </button>
@@ -261,7 +262,7 @@ export default function ApplicationDetailPage() {
                 <button
                   onClick={handleCoverLetter}
                   disabled={busy || resumeEmpty}
-                  className="rounded bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-60"
+                  className="rounded bg-brand px-4 py-2 text-sm font-medium text-brand-fg hover:opacity-90 disabled:opacity-60"
                 >
                   {writing
                     ? 'Writing...'
@@ -273,24 +274,24 @@ export default function ApplicationDetailPage() {
             </div>
 
             {writing && (
-              <p className="mt-3 text-sm text-gray-500">
+              <p className="mt-3 text-sm text-muted">
                 This can take up to a minute when the AI is busy.
               </p>
             )}
 
             {application.coverLetter ? (
               <>
-                <p className="mt-3 whitespace-pre-wrap rounded bg-gray-50 p-3 text-sm text-gray-800">
+                <p className="mt-3 whitespace-pre-wrap rounded bg-line/30 p-3 text-sm text-fg">
                   {application.coverLetter}
                 </p>
-                <p className="mt-2 text-xs text-gray-500">
+                <p className="mt-2 text-xs text-muted">
                   AI can make mistakes. Read the letter and check every claim
                   before you send it.
                 </p>
               </>
             ) : (
               !writing && (
-                <p className="mt-3 text-sm text-gray-500">
+                <p className="mt-3 text-sm text-muted">
                   No cover letter yet.
                 </p>
               )
