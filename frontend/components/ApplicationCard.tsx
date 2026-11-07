@@ -2,12 +2,15 @@
 
 import { Trash2 } from 'lucide-react';
 import Link from 'next/link';
+import { ReactNode } from 'react';
 import { Application, ApplicationStatus, STATUSES } from '@/lib/types';
 
 type Props = {
   application: Application;
   onStatusChange: (id: number, status: ApplicationStatus) => void;
   onDelete: (id: number) => void;
+  handle?: ReactNode;
+  isOverlay?: boolean;
 };
 
 function scoreClasses(score: number) {
@@ -21,11 +24,20 @@ export default function ApplicationCard({
   application,
   onStatusChange,
   onDelete,
+  handle,
+  isOverlay = false,
 }: Props) {
   return (
-    <div className="card p-3 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
-      <div className="flex items-start justify-between gap-2">
-        <div className="min-w-0">
+    <div
+      className={`card p-3 shadow-sm transition ${
+        isOverlay
+          ? 'rotate-2 shadow-xl ring-2 ring-brand/40'
+          : 'hover:-translate-y-0.5 hover:shadow-md'
+      }`}
+    >
+      <div className="flex items-start gap-2">
+        {handle}
+        <div className="min-w-0 flex-1">
           <Link
             href={`/applications/${application.id}`}
             className="block truncate font-semibold text-fg hover:text-brand"

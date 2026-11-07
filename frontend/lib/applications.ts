@@ -5,6 +5,10 @@ export function listApplications() {
   return apiFetch<Application[]>('/applications');
 }
 
+export function getApplication(id: number) {
+  return apiFetch<Application>(`/applications/${id}`);
+}
+
 export function createApplication(input: {
   company: string;
   jobTitle: string;
@@ -12,6 +16,16 @@ export function createApplication(input: {
 }) {
   return apiFetch<Application>('/applications', {
     method: 'POST',
+    body: JSON.stringify(input),
+  });
+}
+
+export function updateApplication(
+  id: number,
+  input: { company?: string; jobTitle?: string; notes?: string },
+) {
+  return apiFetch<Application>(`/applications/${id}`, {
+    method: 'PATCH',
     body: JSON.stringify(input),
   });
 }
@@ -27,8 +41,4 @@ export function deleteApplication(id: number) {
   return apiFetch<{ deleted: boolean }>(`/applications/${id}`, {
     method: 'DELETE',
   });
-}
-
-export function getApplication(id: number) {
-  return apiFetch<Application>(`/applications/${id}`);
 }

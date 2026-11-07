@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ConflictException,
   Injectable,
   UnauthorizedException,
@@ -6,8 +7,11 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcryptjs';
 import { PrismaService } from '../prisma/prisma.service';
+import { ChangePasswordDto } from './dto/change-password.dto';
+import { DeleteAccountDto } from './dto/delete-account.dto';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
+import { UpdateProfileDto } from './dto/update-profile.dto';
 
 @Injectable()
 export class AuthService {
@@ -43,14 +47,63 @@ export class AuthService {
   }
 
   async me(userId: number) {
+    const user = await this.getUserOrFail(userId);
+    return { id: user.id, email: user.email, name: user.name };
+  }
+
+  async updateProfile(userId: number, dto: UpdateProfileDto) {
+    await this.getUserOrFail(userId);
+    const user = await this.prisma.user.update({
+      where: { id: userId },
+      data: { name: dto.name.trim() },
+    });
+    return { id: user.id, email: user.email, name: user.name };
+  }
+
+  async changePassword(userId: number, dto: ChangePasswordDto) {
+    const user = await this.getUserOrFail(userId);
+    const ok = await bcrypt.compare(dto.currentPassword, user.passwordHash);
+    if (!ok) {
+      // 400, 401 nahi: frontend 401 par logout kar deta hai
+      throw new BadRequestException('Current password is incorrect');
+    }
+    if (dto.currentPassword === dto.newPassword) {
+      throw new BadRequestException(
+        'New password must be different from the current one',
+      );
+    }
+    const passwordHash = await bcrypt.hash(dto.newPassword, 10);
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: { passwordHash },
+    });
+    return { success: true };
+  }
+
+  async deleteAccount(userId: number, dto: DeleteAccountDto) {
+    const user = await this.getUserOrFail(userId);
+    const ok = await bcrypt.compare(dto.password, user.passwordHash);
+    if (!ok) {
+      throw new BadRequestException('Password is incorrect');
+    }
+    // Resume aur applications cascade se khud delete ho jati hain
+    await this.prisma.user.delete({ where: { id: userId } });
+    return { deleted: true };
+  }
+
+  private async getUserOrFail(userId: number) {
     const user = await this.prisma.user.findUnique({ where: { id: userId } });
     if (!user) {
       throw new UnauthorizedException();
     }
-    return { id: user.id, email: user.email, name: user.name };
+    return user;
   }
 
-  private async buildResponse(user: { id: number; email: string; name: string }) {
+  private async buildResponse(user: {
+    id: number;
+    email: string;
+    name: string;
+  }) {
     const accessToken = await this.jwt.signAsync({
       sub: user.id,
       email: user.email,

@@ -79,6 +79,11 @@ export default function DashboardPage() {
       await updateApplicationStatus(id, status);
       const label = STATUSES.find((s) => s.value === status)?.label ?? status;
       toast.success(`Moved to ${label}`);
+      if (status === 'OFFER') {
+        import('canvas-confetti').then((m) =>
+          m.default({ particleCount: 120, spread: 80, origin: { y: 0.3 } }),
+        );
+      }
     } catch (err) {
       setApplications(previous);
       handleError(err);
@@ -147,11 +152,10 @@ export default function DashboardPage() {
                     key={s.value}
                     type="button"
                     onClick={() => setFilter(s.value as Filter)}
-                    className={`rounded-full border px-3 py-1 text-xs font-medium transition ${
-                      filter === s.value
+                    className={`rounded-full border px-3 py-1 text-xs font-medium transition ${filter === s.value
                         ? 'border-brand bg-brand text-brand-fg'
                         : 'border-line text-muted hover:text-fg'
-                    }`}
+                      }`}
                   >
                     {s.label}
                   </button>

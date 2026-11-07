@@ -1,6 +1,12 @@
 'use client';
 
-import { FileText, LayoutDashboard, LogOut, Rocket } from 'lucide-react';
+import {
+  FileText,
+  LayoutDashboard,
+  LogOut,
+  Rocket,
+  User as UserIcon,
+} from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
@@ -32,7 +38,6 @@ export default function Navbar() {
   const [open, setOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
-  // Menu ke bahar click karne par band karo
   useEffect(() => {
     function onClick(e: MouseEvent) {
       if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
@@ -97,6 +102,14 @@ export default function Navbar() {
                   </p>
                   <p className="truncate text-xs text-muted">{user.email}</p>
                 </div>
+                <Link
+                  href="/profile"
+                  onClick={() => setOpen(false)}
+                  className="mt-2 flex w-full items-center gap-2 rounded-lg px-2 py-2 text-sm text-fg hover:bg-line/40"
+                >
+                  <UserIcon size={16} />
+                  Profile
+                </Link>
                 <button
                   type="button"
                   onClick={() => {
@@ -105,7 +118,7 @@ export default function Navbar() {
                     router.push('/login');
                     toast.success('Logged out');
                   }}
-                  className="mt-2 flex w-full items-center gap-2 rounded-lg px-2 py-2 text-sm text-fg hover:bg-line/40"
+                  className="flex w-full items-center gap-2 rounded-lg px-2 py-2 text-sm text-fg hover:bg-line/40"
                 >
                   <LogOut size={16} />
                   Logout
