@@ -8,6 +8,7 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
+import { Throttle } from '@nestjs/throttler';
 import { AuthService } from './auth.service';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { DeleteAccountDto } from './dto/delete-account.dto';
@@ -22,11 +23,13 @@ type AuthReq = { user: { sub: number } };
 export class AuthController {
   constructor(private auth: AuthService) {}
 
+  @Throttle({ default: { limit: 10, ttl: 60000 } })
   @Post('register')
   register(@Body() dto: RegisterDto) {
     return this.auth.register(dto);
   }
 
+  @Throttle({ default: { limit: 10, ttl: 60000 } })
   @Post('login')
   login(@Body() dto: LoginDto) {
     return this.auth.login(dto);
@@ -45,12 +48,14 @@ export class AuthController {
   }
 
   @UseGuards(JwtAuthGuard)
+  @Throttle({ default: { limit: 10, ttl: 60000 } })
   @Post('change-password')
   changePassword(@Req() req: AuthReq, @Body() dto: ChangePasswordDto) {
     return this.auth.changePassword(req.user.sub, dto);
   }
 
   @UseGuards(JwtAuthGuard)
+  @Throttle({ default: { limit: 10, ttl: 60000 } })
   @Delete('account')
   deleteAccount(@Req() req: AuthReq, @Body() dto: DeleteAccountDto) {
     return this.auth.deleteAccount(req.user.sub, dto);

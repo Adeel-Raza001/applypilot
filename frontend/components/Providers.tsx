@@ -1,7 +1,7 @@
 'use client';
 
 import { ThemeProvider, useTheme } from 'next-themes';
-import { ReactNode } from 'react';
+import { ReactNode, Suspense } from 'react';
 import { Toaster } from 'sonner';
 import { AuthProvider } from '@/context/AuthContext';
 import Navbar from './Navbar';
@@ -27,7 +27,9 @@ export default function Providers({ children }: { children: ReactNode }) {
       disableTransitionOnChange
     >
       <AuthProvider>
-        <Navbar />
+        <Suspense fallback={null}>
+          <Navbar />
+        </Suspense>
         {children}
         <ThemedToaster />
       </AuthProvider>

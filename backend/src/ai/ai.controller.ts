@@ -6,12 +6,14 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
+import { Throttle } from '@nestjs/throttler';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { AiService } from './ai.service';
 
 type AuthReq = { user: { sub: number } };
 
 @UseGuards(JwtAuthGuard)
+@Throttle({ default: { limit: 8, ttl: 60000 } })
 @Controller('ai')
 export class AiController {
   constructor(private ai: AiService) {}

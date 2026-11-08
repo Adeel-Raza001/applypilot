@@ -10,7 +10,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
-import { useCallback, useEffect, useState } from 'react';
+import { Suspense, useCallback, useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import AiProgress from '@/components/AiProgress';
 import ScoreRing from '@/components/ScoreRing';
@@ -41,7 +41,7 @@ const LETTER_STEPS = [
   'Polishing the wording...',
 ];
 
-export default function ApplicationDetailPage() {
+function ApplicationDetail() {
   const { user, loading, logout } = useAuth();
   const router = useRouter();
   const params = useParams<{ id: string }>();
@@ -369,5 +369,13 @@ export default function ApplicationDetailPage() {
         </>
       )}
     </main>
+  );
+}
+
+export default function ApplicationDetailPage() {
+  return (
+    <Suspense fallback={<PageLoader />}>
+      <ApplicationDetail />
+    </Suspense>
   );
 }
