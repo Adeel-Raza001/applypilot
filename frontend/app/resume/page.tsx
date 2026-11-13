@@ -9,7 +9,7 @@ import { useAuth } from '@/context/AuthContext';
 import { ApiError } from '@/lib/api';
 import { extractResumeText, getResume, saveResume } from '@/lib/resume';
 
-const MAX_BYTES = 5 * 1024 * 1024;
+const MAX_BYTES = 4 * 1024 * 1024;
 
 export default function ResumePage() {
   const { user, loading, logout } = useAuth();
@@ -55,7 +55,7 @@ export default function ResumePage() {
       return;
     }
     if (file.size > MAX_BYTES) {
-      toast.error('File is too large. Maximum size is 5 MB.');
+      toast.error('File is too large. Maximum size is 4 MB.');
       return;
     }
 
@@ -124,7 +124,7 @@ export default function ResumePage() {
             onDrop={onDrop}
             onClick={() => !extracting && inputRef.current?.click()}
             className={`card flex cursor-pointer flex-col items-center gap-2 border-dashed p-8 text-center transition ${
-              dragging ? 'border-brand bg-brand/5' : 'hover:border-brand/60'
+              dragging ? 'border-brand bg-brand/4' : 'hover:border-brand/60'
             }`}
           >
             <input
@@ -151,7 +151,7 @@ export default function ResumePage() {
                 <p className="font-medium text-fg">
                   Click to upload or drag and drop
                 </p>
-                <p className="text-xs text-muted">PDF or DOCX, up to 5 MB</p>
+                <p className="text-xs text-muted">PDF or DOCX, up to 4 MB</p>
               </>
             )}
 
@@ -163,7 +163,7 @@ export default function ResumePage() {
             )}
           </div>
 
-          <div className="rounded-lg bg-amber-500/10 p-3 text-xs text-amber-700 dark:text-amber-400">
+          <div className="rounded-lg bg-amber-400/10 p-3 text-xs text-amber-700 dark:text-amber-400">
             Your text is sent to an AI provider when you analyze or write a
             cover letter. Remove your phone number and home address from the
             text below before saving.

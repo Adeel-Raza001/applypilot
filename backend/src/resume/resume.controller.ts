@@ -42,7 +42,7 @@ export class ResumeController {
   // File se text nikaalta hai, database mein save NAHI karta
   @Post('extract')
   @UseInterceptors(
-    FileInterceptor('file', { limits: { fileSize: 5 * 1024 * 1024 } }),
+    FileInterceptor('file', { limits: { fileSize: 4 * 1024 * 1024 } }),
   )
   extract(@UploadedFile() file: UploadedResume | undefined) {
     return this.extractor.extract(file);
