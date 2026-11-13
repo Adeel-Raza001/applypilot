@@ -1,9 +1,13 @@
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
-import helmet from 'helmet';
+import { createRequire } from 'node:module';
 import { AppModule } from './app.module.js';
 import { DatabaseUnavailableFilter } from './common/database-unavailable.filter.js';
+
+// helmet ke types ESM mein masla karte hain, isliye iska CommonJS build load karte hain
+const require = createRequire(import.meta.url);
+const helmet = require('helmet');
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
