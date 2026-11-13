@@ -10,13 +10,13 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard';
-import { UpsertResumeDto } from './dto/upsert-resume.dto';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard.js';
+import { UpsertResumeDto } from './dto/upsert-resume.dto.js';
 import {
   ResumeExtractService,
   UploadedResume,
-} from './resume-extract.service';
-import { ResumeService } from './resume.service';
+} from './resume-extract.service.js';
+import { ResumeService } from './resume.service.js';
 
 @UseGuards(JwtAuthGuard)
 @Controller('resume')

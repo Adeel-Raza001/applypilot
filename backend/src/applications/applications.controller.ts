@@ -10,11 +10,11 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard';
-import { ApplicationsService } from './applications.service';
-import { CreateApplicationDto } from './dto/create-application.dto';
-import { UpdateApplicationDto } from './dto/update-application.dto';
-import { UpdateStatusDto } from './dto/update-status.dto';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard.js';
+import { ApplicationsService } from './applications.service.js';
+import { CreateApplicationDto } from './dto/create-application.dto.js';
+import { UpdateApplicationDto } from './dto/update-application.dto.js';
+import { UpdateStatusDto } from './dto/update-status.dto.js';
 
 type AuthReq = { user: { sub: number } };
 

@@ -7,8 +7,8 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { Throttle } from '@nestjs/throttler';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard';
-import { AiService } from './ai.service';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard.js';
+import { AiService } from './ai.service.js';
 
 type AuthReq = { user: { sub: number } };
 

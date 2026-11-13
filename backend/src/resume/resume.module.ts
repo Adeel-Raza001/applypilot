@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
-import { AuthModule } from '../auth/auth.module';
-import { ResumeExtractService } from './resume-extract.service';
-import { ResumeController } from './resume.controller';
-import { ResumeService } from './resume.service';
+import { AuthModule } from '../auth/auth.module.js';
+import { ResumeExtractService } from './resume-extract.service.js';
+import { ResumeController } from './resume.controller.js';
+import { ResumeService } from './resume.service.js';
 
 @Module({
   imports: [AuthModule],

@@ -2,13 +2,13 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
-import { AiModule } from './ai/ai.module';
-import { ApplicationsModule } from './applications/applications.module';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
-import { AuthModule } from './auth/auth.module';
-import { PrismaModule } from './prisma/prisma.module';
-import { ResumeModule } from './resume/resume.module';
+import { AiModule } from './ai/ai.module.js';
+import { ApplicationsModule } from './applications/applications.module.js';
+import { AppController } from './app.controller.js';
+import { AppService } from './app.service.js';
+import { AuthModule } from './auth/auth.module.js';
+import { PrismaModule } from './prisma/prisma.module.js';
+import { ResumeModule } from './resume/resume.module.js';
 
 @Module({
   imports: [

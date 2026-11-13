@@ -3,7 +3,7 @@ import {
   Injectable,
   UnprocessableEntityException,
 } from '@nestjs/common';
-import * as mammoth from 'mammoth';
+import mammoth from 'mammoth';
 import { PDFParse } from 'pdf-parse';
 
 export type UploadedResume = {
