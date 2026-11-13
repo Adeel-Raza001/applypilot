@@ -4,7 +4,7 @@ import {
   UnprocessableEntityException,
 } from '@nestjs/common';
 import mammoth from 'mammoth';
-import { PDFParse } from 'pdf-parse';
+import type { PDFParse } from 'pdf-parse';
 
 export type UploadedResume = {
   originalname: string;
@@ -54,15 +54,21 @@ export class ResumeExtractService {
   }
 
   private async readPdf(buffer: Buffer): Promise<string> {
-    const parser = new PDFParse({ data: new Uint8Array(buffer) });
+    let parser: PDFParse | undefined;
     try {
+      // Lazy import: library sirf PDF upload par load hoti hai, startup par nahi.
+      // Is se serverless par baqi app is library ki wajah se crash nahi hoti.
+      const { PDFParse } = await import('pdf-parse');
+      parser = new PDFParse({ data: new Uint8Array(buffer) });
       const result = await parser.getText();
       return result.text;
     } catch (err) {
       console.error('PDF read error:', err);
-      throw new BadRequestException('Could not read this PDF');
+      throw new BadRequestException(
+        'Could not read this PDF. Please upload a DOCX file or paste the text instead.',
+      );
     } finally {
-      await parser.destroy().catch(() => undefined);
+      await parser?.destroy().catch(() => undefined);
     }
   }
 
